@@ -5,6 +5,8 @@ VisualStudioVersion = 17.5.33312.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MiscTweaksAndFixes", "MiscTweaksAndFixes\MiscTweaksAndFixes.csproj", "{91FBCA53-95C8-4AF2-806A-C74F536756B6}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoftenator.Wotr.Common", "..\Microsoftenator.Wotr.Common\Microsoftenator.Wotr.Common.csproj", "{32087FE3-38FE-4791-A642-13272C6E91CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{91FBCA53-95C8-4AF2-806A-C74F536756B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91FBCA53-95C8-4AF2-806A-C74F536756B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91FBCA53-95C8-4AF2-806A-C74F536756B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32087FE3-38FE-4791-A642-13272C6E91CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32087FE3-38FE-4791-A642-13272C6E91CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32087FE3-38FE-4791-A642-13272C6E91CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32087FE3-38FE-4791-A642-13272C6E91CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Microsoftenator.Wotr.Common\Microsoftenator.Wotr.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Info.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
