@@ -23,54 +23,15 @@ using Kingmaker.UI.SettingsUI;
 
 namespace MiscTweaksAndFixes
 {
-    public class MiscTweaksMod : ModBase
-    {
-        //    public class ModSettings : UnityModManager.ModSettings, IDrawable
-        //    {
-        //        [Draw("Natural weapon damage stacking")] public bool NaturalWeaponDamageStacking = true;
-
-        //        public override void Save(UnityModManager.ModEntry modEntry) => Save(this, modEntry);
-
-        //        public void OnChange()
-        //        {
-        //            Main.ApplySettings(this);
-        //        }
-        //    }
-
-        //    public ModSettings Settings { get; internal set; }
-
-        //    public void ApplySettings(ModSettings settings)
-        //    {
-        //        Settings = settings;
-
-        //        NaturalWeaponStacking.NaturalAttackStackingPatch(settings.NaturalWeaponDamageStacking);
-        //    }
-
-        //    public MiscTweaksMod()
-        //    {
-        //        Settings = new();
-
-        //        this.OnGUI = Settings.Draw;
-        //        this.OnSaveGUI = Settings.Save;
-        //    }
-    }
+    public class MiscTweaksMod : ModBase { }
 
     static class Main
     {
         internal static MiscTweaksMod Mod = new();
 
-        //internal static readonly int SharedModVersion = 0;
-
-        //internal static Func<IEnumerable<BlueprintInfo>, bool> AddSharedBlueprints { get; private set; } = _ => false;
-
         internal static Microsoftenator.Wotr.Common.ModTemplate.Logger Log => Mod.Log;
 
         internal static bool Enabled { get; private set; } = false;
-
-        //internal static void ApplySettings(MiscTweaksMod.ModSettings settings)
-        //{
-        //    Mod.ApplySettings(settings);
-        //}
 
         private static LocalizedString CreateString(string key, string str)
         {
@@ -141,7 +102,7 @@ namespace MiscTweaksAndFixes
                     "Reformed Fiend DR/good",
                     defaultValue: false,
                     longDescription:
-                        "Changes the damage reduction for the Reformed Fiend Bloodrage archetype from DR/evil to "
+                        "Changes the damage reduction for the Reformed Fiend Bloodrager archetype from DR/evil to "
                         + "DR/good.\n"
                         + "Requires restart.")
                 .OnValueChanged(newValue => ReformedFiend.ReformedFiendDamageReductionGood.Enabled = newValue);
@@ -151,10 +112,28 @@ namespace MiscTweaksAndFixes
                     $"{nameof(StrengthBlessingMajor.StrengthBlessingMajorBuff)}",
                     "Major Strength Blessing armor speed fix",
                     longDescription:
-                        "Warpriest's Major Blessing for Strength domain now applies to heavy armor in addition to " +
-                        "medium armor.\n"
+                        "Warpriest's Major Blessing for Strength domain now applies to heavy armor in addition to "
+                        + "medium armor.\n"
                         + "Requires restart.")
                 .OnValueChanged(newValue => StrengthBlessingMajor.StrengthBlessingMajorBuff.Enabled = newValue);
+
+            var dollRoomPpColorAdjustmentsFilter =
+                CreateSettingToggle(
+                    $"{nameof(DollRoomFilters.DollRoomFilters.ColorAdjustmentsFilter)}",
+                    "\"Color Adjustments\"",
+                    defaultValue: false,
+                    longDescription: "Enable or disable the \"Color Adjustments\" filter in the \"doll room\". "
+                    + "Disabled by default.")
+                .OnValueChanged(newValue => DollRoomFilters.DollRoomFilters.ColorAdjustmentsFilter = newValue);
+
+            var dollRoomPpSlopePowerOffsetFilter =
+                CreateSettingToggle(
+                    $"{nameof(DollRoomFilters.DollRoomFilters.SlopePowerOffsetFilter)}",
+                    "\"Slope Power Offset\"",
+                    defaultValue: true,
+                    longDescription: "Enable or disable the \"Slope Power Offset\" filter in the \"doll room\". "
+                    + "Enabled by default.")
+                .OnValueChanged(newValue => DollRoomFilters.DollRoomFilters.ColorAdjustmentsFilter = newValue);
 
             var settings =
                 SettingsBuilder.New(SettingsRootKey,
@@ -163,7 +142,10 @@ namespace MiscTweaksAndFixes
                 .AddToggle(bookOfDreamsToggle)
                 .AddToggle(naturalWeaponStacking)
                 .AddToggle(reformedFiendDRToggle)
-                .AddToggle(strengthBlessingMajorFixToggle);
+                .AddToggle(strengthBlessingMajorFixToggle)
+                .AddSubHeader(CreateString(nameof(DollRoomFilters), "Dollroom post-processing filters"), true)
+                .AddToggle(dollRoomPpColorAdjustmentsFilter)
+                .AddToggle(dollRoomPpSlopePowerOffsetFilter);
             
             ModMenu.ModMenu.AddSettings(settings);
         }
@@ -176,12 +158,7 @@ namespace MiscTweaksAndFixes
 
             Mod.OnLoad(modEntry, harmony);
 
-            //Mod.Settings = UnityModManager.ModSettings.Load<MiscTweaksMod.ModSettings>(modEntry);
-
             harmony.PatchAll();
-
-            //SharedMods.Register(modEntry.Info.Id, SharedModVersion);
-            //AddSharedBlueprints = blueprints => SharedMods.AddBlueprints(modEntry.Info.Id, SharedModVersion, blueprints);
 
             return true;
         }
@@ -197,19 +174,6 @@ namespace MiscTweaksAndFixes
     [HarmonyAfter("TabletopTweaks-Core", "TabletopTweaks-Base")]
     internal class BlueprintsCache_Init_Patch
     {
-        //static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-        //{
-        //    var addMethod = ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.GetType().GetMethod("Add");
-        //    var setMethod = ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.GetType().GetMethod("set_Item");
-
-        //    return instructions.Select(i =>
-        //    {
-        //        if (i.opcode == OpCodes.Callvirt && i.Calls(addMethod))
-        //            i.operand = setMethod;
-        //        return i;
-        //    });
-        //}
-
         private static bool completed;
 
         static void Postfix()
