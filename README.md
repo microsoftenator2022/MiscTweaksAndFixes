@@ -51,7 +51,7 @@ Disabled by default.
 
 ### Dollroom postprocessing filter toggles
 
-Allows you to disable some postprocess filters in the dollroom (inventory screen, character creatopm. mythic level up, etc.)
+Allows you to disable some postprocess filters in the dollroom (inventory screen, character creation. mythic level up, etc.)
 
 ## Acknowledgements
 
