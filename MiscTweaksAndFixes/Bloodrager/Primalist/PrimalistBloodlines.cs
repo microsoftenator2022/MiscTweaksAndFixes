@@ -19,7 +19,7 @@ using Microsoftenator.Wotr.Common.Blueprints;
 using Microsoftenator.Wotr.Common.Blueprints.Extensions;
 using Microsoftenator.Wotr.Common.Util;
 
-namespace MiscTweaksAndFixes.Primalist
+namespace MiscTweaksAndFixes
 {
     public static partial class OwlcatBlueprints
     {
@@ -77,7 +77,10 @@ namespace MiscTweaksAndFixes.Primalist
         public static readonly OwlcatBlueprint<BlueprintProgression> PrimalistTakeRagePowers20 =
             new(Guids.PrimalistTakeRagePowers20);
     }
+}
 
+namespace MiscTweaksAndFixes.Bloodrager.Primalist
+{
     public static class PrimalistBloodlineFixes
     {
         public static bool Enabled { get; internal set; } = true;
@@ -93,8 +96,8 @@ namespace MiscTweaksAndFixes.Primalist
             }
 
             public PrerequisiteInProgression(BlueprintProgression progression) : this(new[] { progression }) { }
-            
-            public IEnumerable<BlueprintProgression>? Progressions => 
+
+            public IEnumerable<BlueprintProgression>? Progressions =>
                 Features.OfType<BlueprintProgression>();
 
             public override bool CheckInternal(FeatureSelectionState selectionState, UnitDescriptor unit, LevelUpState state)
@@ -189,14 +192,14 @@ namespace MiscTweaksAndFixes.Primalist
             Main.Log.Debug($"{nameof(PrimalistBloodlineFixes)}.{nameof(PatchPrimalistProgression)}");
 
 
-            if (!Enabled) 
+            if (!Enabled)
             {
                 Main.Log.Info($"{nameof(PrimalistBloodlineFixes)} DISABLED");
                 return;
             }
 
             //Main.AddSharedBlueprints(SharedBlueprints);
-            
+
             var primalistProgression = OwlcatBlueprints.PrimalistProgression.GetBlueprint();
 
             var ragePowerEntries = GetRagePowerEntries();
@@ -278,7 +281,7 @@ namespace MiscTweaksAndFixes.Primalist
                         {
                             selection.AddFeature(feat);
 
-                            if(feat.Components.OfType<PrerequisiteCustom>().Any()) continue;
+                            if (feat.Components.OfType<PrerequisiteCustom>().Any()) continue;
 
                             // Only show selection in the UI when available
                             feat.AddComponent(new PrerequisiteCustom()
@@ -287,17 +290,17 @@ namespace MiscTweaksAndFixes.Primalist
                                 Predicate = (selectionState, unit, state) =>
                                 {
                                     return
-                                    (
-                                        (
+                                    
+                                        
                                             unit.Progression.Features.HasFact(primalistProgression)
                                             && selectionState?.Selection == selection
-                                        )
+                                        
                                         ||
-                                        (
+                                        
                                             !unit.Progression.Features.HasFact(primalistProgression)
-                                            //&& selectionState?.Selection != selection
-                                        )
-                                    );
+                                        //&& selectionState?.Selection != selection
+                                        
+                                    ;
                                 },
 
                                 CheckInProgression = true

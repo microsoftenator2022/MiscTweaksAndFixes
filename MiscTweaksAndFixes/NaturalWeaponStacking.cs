@@ -36,6 +36,8 @@ using Microsoftenator.Wotr.Common.Blueprints;
 using Microsoftenator.Wotr.Common.Blueprints.Extensions;
 using Microsoftenator.Wotr.Common.Util;
 
+using MiscTweaksAndFixes.Bloodrager;
+
 namespace MiscTweaksAndFixes.NaturalWeaponStacking
 {
     internal static class NaturalWeaponStacking
@@ -73,7 +75,7 @@ namespace MiscTweaksAndFixes.NaturalWeaponStacking
                 var (emptyHandWeapons,
                     secondaryAttacks,
                     additionalLimbs) = GetNaturalWeapons(__instance.Wielder, blueprint.Category);
-
+                
                 var sizeIncrease = emptyHandWeapons.Count()
                     + additionalLimbs.Count()
                     + secondaryAttacks.Select(sa => sa.Weapon.Count()).Sum()
@@ -81,10 +83,9 @@ namespace MiscTweaksAndFixes.NaturalWeaponStacking
 
                 var newSize = size + Math.Max(0, sizeIncrease);
 
-                if (size != newSize)
-                    Main.Log.Debug($"Size change = {sizeIncrease}: " +
-                        $"{WeaponDamageScaleTable.Scale(blueprint.BaseDamage, size, blueprint.Size)} ({size}) " +
-                        $"-> {WeaponDamageScaleTable.Scale(blueprint.BaseDamage, newSize, blueprint.Size)} ({newSize})");
+                Main.Log.Debug($"Size change = {sizeIncrease}: " +
+                    $"{WeaponDamageScaleTable.Scale(blueprint.BaseDamage, size, blueprint.Size)} ({size}) " +
+                    $"-> {WeaponDamageScaleTable.Scale(blueprint.BaseDamage, newSize, blueprint.Size)} ({newSize})");
 
                 return newSize;
             }
@@ -151,100 +152,150 @@ namespace MiscTweaksAndFixes.NaturalWeaponStacking
         }
 
         public static IEnumerable<EmptyHandWeaponOverride> EmptyHandWeaponOverrides(BlueprintUnitFact bpuf) =>
-            bpuf.Components.OfType<EmptyHandWeaponOverride>().ToArray();
+            bpuf.ComponentsArray.OfType<EmptyHandWeaponOverride>().ToArray();
         public static IEnumerable<AddSecondaryAttacks> AddSecondaryAttacks(BlueprintUnitFact bpuf) =>
-            bpuf.Components.OfType<AddSecondaryAttacks>().ToArray();
+            bpuf.ComponentsArray.OfType<AddSecondaryAttacks>().ToArray();
         public static IEnumerable<AddAdditionalLimb> AddAdditionalLimbs(BlueprintUnitFact bpuf) =>
-            bpuf.Components.OfType<AddAdditionalLimb>().ToArray();
+            bpuf.ComponentsArray.OfType<AddAdditionalLimb>().ToArray();
 
-        public static (IEnumerable<EmptyHandWeaponOverride> emptyHandWeapons,
-            IEnumerable<AddSecondaryAttacks> secondaryAttacks,
-            IEnumerable<AddAdditionalLimb> additionalLimbs) GetNaturalWeapons(UnitEntityData unitData, WeaponCategory weaponCategory)
+        public static (BlueprintUnitFact[] emptyHandWeaponOverrides,
+            BlueprintUnitFact[] secondaryAttacks, BlueprintUnitFact[] additionalLimbs)
+        GetNaturalWeaponsForUnit(UnitEntityData unit)
         {
+            Main.Log.Debug($"{nameof(NaturalWeaponStacking)}.{nameof(GetNaturalWeaponsForUnit)}");
+
             var buffs =
-                unitData.Buffs.Enumerable
+                unit.Buffs.Enumerable
                     .Select(buff => buff.Blueprint)
                     .ToArray();
 
             var facts =
-                unitData.Facts.List
+                unit.Facts.List
                     .OfType<UnitFact>()
                     .Where(f => f is not Buff)
                     .Select(f => f.Blueprint)
                     .Concat(buffs)
                     .ToArray();
 
-            var emptyHandWeapons =
-                facts.SelectMany(EmptyHandWeaponOverrides);
-
-            var secondaryAttacks =
-                facts.SelectMany(AddSecondaryAttacks);
-
-            var additionalLimbs =
-                facts.SelectMany(AddAdditionalLimbs);
-
-            Main.Log.Debug($"EmptyHandOverride: {emptyHandWeapons.Count()}, " +
-                $"AddSecondaryAttacks: {secondaryAttacks.Count()}, " +
-                $"AddAdditionalLimb: {additionalLimbs.Count()}");
-
-#if DEBUG
-            if (emptyHandWeapons.Count() > 0)
+            // Special case for bloodrager draconic claws
+            if (unit.Buffs.HasFact(OwlcatBlueprints.BloodragerDraconicBaseBuff.GetBlueprint()))
             {
-                Main.Log.Debug("Empty hand overrides:");
-                foreach (var eho in facts.Where(f => f.Components.OfType<EmptyHandWeaponOverride>().Any()))
+                Main.Log.Debug("Draconic bloodrager handler");
+
+                var bloodragerClawBuffs =
+                    BloodlineClawsBuffs.GetBloodragerDragonClawFeaturesFor(unit)
+                        .Select(f => BloodlineClawsBuffs.FeatureBuffMap[f])
+                        .ToList();
+                
+                if(Main.Mod.Settings.DebugLogging)
                 {
-                    Main.Log.Debug($"    {eho.Name} - {eho.AssetGuid}");
-                    foreach (var c in eho.Components.OfType<EmptyHandWeaponOverride>())
-                        Main.Log.Debug(
-                            $"      {(c.Weapon.Category == weaponCategory ? "*" : " ")} " +
-                            $"{c.Weapon.Name} ({c.Weapon.Category}) - {c.Weapon.AssetGuid}");
+                    foreach(var buff in bloodragerClawBuffs)
+                        Main.Log.Debug($"Natural weapon buff: {buff.Name} - {buff.AssetGuid}");
                 }
+
+                if (facts.FirstOrDefault(b => bloodragerClawBuffs.Contains(b)) is BlueprintBuff b)
+                    bloodragerClawBuffs.Remove(b);
+
+                var factsList = facts.ToList();
+
+                foreach (var buff in bloodragerClawBuffs)
+                {
+                    Main.Log.Debug($"Selected extra natural weapon buff: {buff.Name} - {buff.AssetGuid}");
+                    factsList.Add(buff);
+                }
+
+                facts = factsList.ToArray();
             }
 
-            if (secondaryAttacks.Count() > 0)
-            {
-                Main.Log.Debug("Secondary attacks:");
-                foreach (var sa in facts.Where(f => f.Components.OfType<AddSecondaryAttacks>().Any()))
-                {
-                    Main.Log.Debug($"    {sa.Name} - {sa.AssetGuid}");
-                    foreach (var w in sa.Components.OfType<AddSecondaryAttacks>().SelectMany(c => c.Weapon))
-                    {
-                        Main.Log.Debug(
-                            $"      {(w.Category == weaponCategory ? "*" : " ")} " +
-                            $"{w.Name} ({w.Category}) - {w.AssetGuid}");
-                    }
+            var ehwo = facts.Where(f => f.Components.OfType<EmptyHandWeaponOverride>().Any()).ToArray();
+            var asa = facts.Where(f => f.Components.OfType<AddSecondaryAttacks>().Any()).ToArray();
+            var aal = facts.Where(f => f.Components.OfType<AddAdditionalLimb>().Any()).ToArray();
 
-                }
-            }
-
-            if (additionalLimbs.Count() > 0)
-            {
-                Main.Log.Debug("Additional Limbs:");
-                foreach (var al in facts.Where(f => f.Components.OfType<AddAdditionalLimb>().Any()))
-                {
-                    Main.Log.Debug($"    {al.Name} - {al.AssetGuid}");
-                    foreach (var c in al.Components.OfType<AddAdditionalLimb>())
-                        Main.Log.Debug(
-                            $"      {(c.Weapon.Category == weaponCategory ? "*" : " ")} " +
-                            $"{c.Weapon.Name} ({c.Weapon.Category}) - {c.Weapon.AssetGuid}");
-                }
-            }
-#endif
-
-            return (emptyHandWeapons.Where(w => w.Weapon.Category == weaponCategory),
-                secondaryAttacks.Where(sa => sa.Weapon.Any(w => w.Category == weaponCategory)),
-                additionalLimbs.Where(al => al.Weapon.Category == weaponCategory));
+            return
+            (
+                ehwo,
+                asa,
+                aal
+            );
         }
 
         public static IEnumerable<BlueprintItemWeapon> GetAllNaturalWeapons(UnitEntityData unit)
         {
-            var facts = unit.Facts.List.OfType<UnitFact>().Select(f => f.Blueprint).ToArray();
+            var facts = GetNaturalWeaponsForUnit(unit);
 
-            var emptyHandWeapons = facts.SelectMany(EmptyHandWeaponOverrides).Select(c => c.Weapon);
-            var secondaryAttacks = facts.SelectMany(AddSecondaryAttacks).SelectMany(c => c.Weapon);
-            var additionalLimbs = facts.SelectMany(AddAdditionalLimbs).Select(c => c.Weapon);
+            var emptyHandWeapons = facts.emptyHandWeaponOverrides.SelectMany(EmptyHandWeaponOverrides).Select(c => c.Weapon);
+            var secondaryAttacks = facts.secondaryAttacks.SelectMany(AddSecondaryAttacks).SelectMany(c => c.Weapon);
+            var additionalLimbs = facts.additionalLimbs.SelectMany(AddAdditionalLimbs).Select(c => c.Weapon);
 
             return emptyHandWeapons.Concat(secondaryAttacks).Concat(additionalLimbs);
+        }
+
+        public static (IEnumerable<EmptyHandWeaponOverride> emptyHandWeapons,
+            IEnumerable<AddSecondaryAttacks> secondaryAttacks,
+            IEnumerable<AddAdditionalLimb> additionalLimbs) GetNaturalWeapons(UnitEntityData unitData, WeaponCategory weaponCategory)
+        {
+            Main.Log.Debug($"{nameof(NaturalWeaponStacking)}.{nameof(GetNaturalWeapons)}");
+
+            var (emptyHandWeapons, secondaryAttacks, additionalLimbs) = GetNaturalWeaponsForUnit(unitData);
+
+
+            if (!Main.Mod.Settings.DebugLogging)
+            {
+                Main.Log.Debug($"Debug disabled");
+            }
+
+            if (Main.Mod.Settings.DebugLogging)
+            {
+                Main.Log.Debug($"EmptyHandOverride: {emptyHandWeapons.Count()}, " +
+                    $"AddSecondaryAttacks: {secondaryAttacks.Count()}, " +
+                    $"AddAdditionalLimb: {additionalLimbs.Count()}");
+
+                if (emptyHandWeapons.Count() > 0)
+                {
+                    Main.Log.Debug("Empty hand overrides:");
+                    foreach (var eho in emptyHandWeapons)
+                    {
+                        Main.Log.Debug($"    {eho.Name} - {eho.AssetGuid}");
+                        foreach (var c in eho.Components.OfType<EmptyHandWeaponOverride>())
+                            Main.Log.Debug(
+                                $"      {(c.Weapon.Category == weaponCategory ? "*" : " ")} " +
+                                $"{c.Weapon.Name} ({c.Weapon.Category}) - {c.Weapon.AssetGuid}");
+                    }
+                }
+
+                if (secondaryAttacks.Count() > 0)
+                {
+                    Main.Log.Debug("Secondary attacks:");
+                    foreach (var sa in secondaryAttacks)
+                    {
+                        Main.Log.Debug($"    {sa.Name} - {sa.AssetGuid}");
+                        foreach (var w in sa.Components.OfType<AddSecondaryAttacks>().SelectMany(c => c.Weapon))
+                        {
+                            Main.Log.Debug(
+                                $"      {(w.Category == weaponCategory ? "*" : " ")} " +
+                                $"{w.Name} ({w.Category}) - {w.AssetGuid}");
+                        }
+
+                    }
+                }
+
+                if (additionalLimbs.Count() > 0)
+                {
+                    Main.Log.Debug("Additional Limbs:");
+                    foreach (var al in additionalLimbs)
+                    {
+                        Main.Log.Debug($"    {al.Name} - {al.AssetGuid}");
+                        foreach (var c in al.Components.OfType<AddAdditionalLimb>())
+                            Main.Log.Debug(
+                                $"      {(c.Weapon.Category == weaponCategory ? "*" : " ")} " +
+                                $"{c.Weapon.Name} ({c.Weapon.Category}) - {c.Weapon.AssetGuid}");
+                    }
+                }
+            }
+
+            return (emptyHandWeapons.SelectMany(EmptyHandWeaponOverrides).Where(w => w.Weapon.Category == weaponCategory),
+                secondaryAttacks.SelectMany(AddSecondaryAttacks).Where(sa => sa.Weapon.Any(w => w.Category == weaponCategory)),
+                additionalLimbs.SelectMany(AddAdditionalLimbs).Where(al => al.Weapon.Category == weaponCategory));
         }
 
         public static bool Enabled { get; internal set; } = true;

@@ -11,7 +11,7 @@ using Microsoftenator.Wotr.Common.Blueprints;
 using Microsoftenator.Wotr.Common.Blueprints.Extensions;
 using Microsoftenator.Wotr.Common;
 
-namespace MiscTweaksAndFixes.ReformedFiend
+namespace MiscTweaksAndFixes
 {
     public static partial class OwlcatBlueprints
     {
@@ -23,7 +23,10 @@ namespace MiscTweaksAndFixes.ReformedFiend
         public static readonly OwlcatBlueprint<BlueprintFeature> ReformedFiendDamageReductionFeature =
             new(Guids.ReformedFiendDamageReductionFeature);
     }
+}
 
+namespace MiscTweaksAndFixes.Bloodrager
+{
     public static class ReformedFiendDamageReductionGood
     {
         public static bool Enabled { get; internal set; } = true;

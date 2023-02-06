@@ -21,134 +21,69 @@ using ModMenu;
 using ModMenu.Settings;
 using Kingmaker.UI.SettingsUI;
 
+using MiscTweaksAndFixes.Bloodrager;
+using MiscTweaksAndFixes.Bloodrager.Primalist;
+
+namespace System.Runtime.CompilerServices
+{
+    [DebuggerNonUserCode]
+    internal static class IsExternalInit { }
+}
+
 namespace MiscTweaksAndFixes
 {
-    public class MiscTweaksMod : ModBase { }
+    internal partial class MiscTweaksMod : ModBase
+    {
+        internal class Logger : Microsoftenator.Wotr.Common.ModTemplate.Logger
+        {
+            internal Logger(UnityModManager.ModEntry modEntry, Microsoftenator.Wotr.Common.ModTemplate.Logger other)
+                : base(modEntry.Logger, other) { }
 
+            public override void Debug(string message)
+            {
+                if(Main.Mod.Settings.DebugLogging)
+                    base.Debug(message);
+            }
+        }
+
+        internal readonly ModSettings Settings;
+
+        internal MiscTweaksMod()
+        {
+            Settings = new();
+        }
+
+        public override bool OnLoad(UnityModManager.ModEntry modEntry, Harmony? harmony = null,
+            bool harmonyPatch = false)
+        {
+            Log = new Logger(modEntry, this.Log);
+
+            var baseOnLoad = base.OnLoad(modEntry, harmony, harmonyPatch);
+
+            OnUnload = modEntry =>
+            {
+                if(modEntry.Info.Id == this.ModEntry.Info.Id)
+                { 
+                    harmony?.UnpatchAll(modEntry.Info.Id);
+                }
+
+                return true;
+            };
+
+            return baseOnLoad;
+        }
+    }
+
+#if DEBUG
+    [EnableReloading]
+#endif
     static class Main
     {
-        internal static MiscTweaksMod Mod = new();
+        internal static readonly MiscTweaksMod Mod = new();
 
         internal static Microsoftenator.Wotr.Common.ModTemplate.Logger Log => Mod.Log;
 
         internal static bool Enabled { get; private set; } = false;
-
-        private static LocalizedString CreateString(string key, string str)
-        {
-            Localization.Default.Add(key, str);
-
-            return Localization.Default.Get(key) ?? throw new NullReferenceException();
-        }
-
-        private static string SettingsRootKey => $"{Main.Mod.ModEntry.Info.Id}".ToLower();
-
-        private static Toggle CreateSettingToggle(string name, string description, bool defaultValue = true, string? longDescription = null)
-        {
-            var nameKey = $"{SettingsRootKey}.{name}".ToLower();
-
-            Main.Log.Debug($"New toggle key: \"{nameKey}\"");
-
-            var toggle = Toggle.New(nameKey, defaultValue, CreateString($"{nameKey}.Toggle.Description", description));
-
-            if(longDescription is not null)
-                toggle = toggle.WithLongDescription(CreateString($"{nameKey}.Toggle.LongDescription", longDescription));
-
-            return toggle;
-        }
-
-        internal static void SettingsInit()
-        {
-            var primalistToggle = 
-                CreateSettingToggle(
-                    $"{nameof(Primalist.PrimalistBloodlineFixes)}",
-                    "Primalist bloodline selection fix",
-                    longDescription:
-                        "Primalist bloodline selections are now per-bloodline and should function correctly when "
-                        + "combined with Dragon Disciple and/or Second Bloodline (still two rage powers per 4 "
-                        + "levels, but you can choose which bloodline's power to trade)\n"
-                        + "Requires restart.")
-                .OnValueChanged(newValue => Primalist.PrimalistBloodlineFixes.Enabled = newValue);
-
-            var bookOfDreamsToggle = 
-                CreateSettingToggle(
-                    $"{nameof(BookOfDreams.BookOfDreamsFix)}",
-                    "Book of Dreams upgrade fix",
-                    defaultValue: false,
-                    longDescription:
-                        "The Book of Dreams item is supposed to upgrade at certain points in the story, "
-                        + "but this has never reliably worked (at least in my experience).\n"
-                        + "Enabling this forces the upgrade script to run on every Etude update.")
-                .OnValueChanged(newValue => BookOfDreams.BookOfDreamsFix.Enabled = newValue);
-
-            var naturalWeaponStacking =
-                CreateSettingToggle(
-                    $"{nameof(NaturalWeaponStacking.NaturalWeaponStacking)}",
-                    "Natural weapon stacking",
-                    longDescription:
-                        "Previously, if you got multiple natural attacks of the same type from different "
-                        + "features/buffs/etc. you would get extra attacks per round. This was 'fixed' by Owlcat at "
-                        + "some point so now extra natural attacks give no benefit to PCs.\n"
-                        + "With this enabled, vanilla behaviour is replaced with an approximation of the tabletop rules:\n"
-                        + "Addtional natural attacks of the same kind gives a stacking increase to the effective size "
-                        + "of the 'weapon' (eg. 2 pairs of Medium claw attacks effectively grant 1 pair of Large claw "
-                        + "attacks instead).\n"
-                        + "You get all 'enchantment' effects (eg. fire damage/DR penetration) but multiple enchants "
-                        + "of the same type do not stack.")
-                .OnValueChanged(newValue => NaturalWeaponStacking.NaturalWeaponStacking.Enabled = newValue);
-
-            var reformedFiendDRToggle =
-                CreateSettingToggle(
-                    $"{nameof(ReformedFiend.ReformedFiendDamageReductionGood)}",
-                    "Reformed Fiend DR/good",
-                    defaultValue: false,
-                    longDescription:
-                        "Changes the damage reduction for the Reformed Fiend Bloodrager archetype from DR/evil to "
-                        + "DR/good.\n"
-                        + "Requires restart.")
-                .OnValueChanged(newValue => ReformedFiend.ReformedFiendDamageReductionGood.Enabled = newValue);
-
-            var strengthBlessingMajorFixToggle =
-                CreateSettingToggle(
-                    $"{nameof(StrengthBlessingMajor.StrengthBlessingMajorBuff)}",
-                    "Major Strength Blessing armor speed fix",
-                    longDescription:
-                        "Warpriest's Major Blessing for Strength domain now applies to heavy armor in addition to "
-                        + "medium armor.\n"
-                        + "Requires restart.")
-                .OnValueChanged(newValue => StrengthBlessingMajor.StrengthBlessingMajorBuff.Enabled = newValue);
-
-            var dollRoomPpColorAdjustmentsFilter =
-                CreateSettingToggle(
-                    $"{nameof(DollRoomFilters.DollRoomFilters.ColorAdjustmentsFilter)}",
-                    "\"Color Adjustments\"",
-                    defaultValue: false,
-                    longDescription: "Enable or disable the \"Color Adjustments\" filter in the \"doll room\". "
-                    + "Disabled by default.")
-                .OnValueChanged(newValue => DollRoomFilters.DollRoomFilters.ColorAdjustmentsFilter = newValue);
-
-            var dollRoomPpSlopePowerOffsetFilter =
-                CreateSettingToggle(
-                    $"{nameof(DollRoomFilters.DollRoomFilters.SlopePowerOffsetFilter)}",
-                    "\"Slope Power Offset\"",
-                    defaultValue: true,
-                    longDescription: "Enable or disable the \"Slope Power Offset\" filter in the \"doll room\". "
-                    + "Enabled by default.")
-                .OnValueChanged(newValue => DollRoomFilters.DollRoomFilters.ColorAdjustmentsFilter = newValue);
-
-            var settings =
-                SettingsBuilder.New(SettingsRootKey,
-                    CreateString($"{nameof(MiscTweaksAndFixes)}.Title", "Miscellaneous Tweaks and Fixes"))
-                .AddToggle(primalistToggle)
-                .AddToggle(bookOfDreamsToggle)
-                .AddToggle(naturalWeaponStacking)
-                .AddToggle(reformedFiendDRToggle)
-                .AddToggle(strengthBlessingMajorFixToggle)
-                .AddSubHeader(CreateString(nameof(DollRoomFilters), "Dollroom post-processing filters"), true)
-                .AddToggle(dollRoomPpColorAdjustmentsFilter)
-                .AddToggle(dollRoomPpSlopePowerOffsetFilter);
-            
-            ModMenu.ModMenu.AddSettings(settings);
-        }
 
         static bool Load(UnityModManager.ModEntry modEntry)
         {
@@ -168,6 +103,13 @@ namespace MiscTweaksAndFixes
     {
         private static readonly Lazy<LocalizedStringsPack> defaultStringsLazy = new(() => new(LocalizationManager.CurrentLocale));
         public static LocalizedStringsPack Default => defaultStringsLazy.Value;
+
+        internal static LocalizedString CreateString(string key, string str)
+        {
+            Localization.Default.Add(key, str);
+
+            return Localization.Default.Get(key) ?? throw new NullReferenceException();
+        }
     }
 
     [HarmonyPatch(typeof(BlueprintsCache), nameof(BlueprintsCache.Init))]
@@ -188,12 +130,14 @@ namespace MiscTweaksAndFixes
 
             Main.Log.Debug($"{nameof(BlueprintsCache_Init_Patch)}.{nameof(Postfix)}");
 
-            Main.SettingsInit();
+            MiscTweaksMod.ModSettings.SettingsInit();
 
-            ReformedFiend.ReformedFiendDamageReductionGood.PatchDamageReduction();
+            ReformedFiendDamageReductionGood.PatchDamageReduction();
             BookOfDreams.BookOfDreamsFix.BookOfDreamsUpgradeFix();
             StrengthBlessingMajor.StrengthBlessingMajorBuff.ArmorSpeedFix();
-            Primalist.PrimalistBloodlineFixes.PatchPrimalistProgression();
+            PrimalistBloodlineFixes.PatchPrimalistProgression();
+
+            BloodragerDraconicBaseBuffFixes.FixBloodragerDraconicClawsBuff();
 
             Localization.Default.LoadAll();
         }

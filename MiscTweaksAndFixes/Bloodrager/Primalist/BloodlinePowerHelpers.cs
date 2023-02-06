@@ -10,7 +10,7 @@ using Microsoftenator.Wotr.Common.Util;
 
 using MoreLinq;
 
-namespace MiscTweaksAndFixes.Primalist
+namespace MiscTweaksAndFixes.Bloodrager.Primalist
 {
     internal static class BloodlinePowerHelpers
     {
