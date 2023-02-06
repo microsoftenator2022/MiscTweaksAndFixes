@@ -49,6 +49,10 @@ upgrade script to run on every Etude update. Disabled by default.
 Changes the damage reduction for the Reformed Fiend Bloodrage archetype from DR/evil to DR/good.
 Disabled by default.
 
+### Dollroom postprocessing filter toggles
+
+Allows you to disable some postprocess filters in the dollroom (inventory screen, character creatopm. mythic level up, etc.)
+
 ## Acknowledgements
 
 * Special thanks to the modding community on [Discord](https://discord.com/invite/wotr) - in particular, Pheonix99 and Bubbles.
