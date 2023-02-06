@@ -31,6 +31,13 @@ Primalist bloodline selections are now per-bloodline and should function correct
 Dragon Disciple and/or Second Bloodline (still two rage powers per 4 levels, but you can choose which
 bloodline's power to trade).
 
+### Bloodrager Draconic Claws fix
+Fixes claw progression for draconic bloodrager bloodlines: 
+
+Correct progression: 1d6, 1d8, 1d8 (Magic), 1d8+1d6 elemental (Magic)
+
+Actual progression (without fix): 1d6, 1d6, 1d6, 1d8 (Magic), 1d8+1d6 elemental (Magic)
+
 ### Force Book of Dreams Upgrade
 
 The Book of Dreams item is supposed to upgrade at certain points in the story,
