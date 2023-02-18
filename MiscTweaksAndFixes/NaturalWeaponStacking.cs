@@ -239,11 +239,7 @@ namespace MiscTweaksAndFixes.NaturalWeaponStacking
             var (emptyHandWeapons, secondaryAttacks, additionalLimbs) = GetNaturalWeaponsForUnit(unitData);
 
 
-            if (!Main.Mod.Settings.DebugLogging)
-            {
-                Main.Log.Debug($"Debug disabled");
-            }
-
+            #region Debug Logging
             if (Main.Mod.Settings.DebugLogging)
             {
                 Main.Log.Debug($"EmptyHandOverride: {emptyHandWeapons.Count()}, " +
@@ -292,6 +288,7 @@ namespace MiscTweaksAndFixes.NaturalWeaponStacking
                     }
                 }
             }
+            #endregion
 
             return (emptyHandWeapons.SelectMany(EmptyHandWeaponOverrides).Where(w => w.Weapon.Category == weaponCategory),
                 secondaryAttacks.SelectMany(AddSecondaryAttacks).Where(sa => sa.Weapon.Any(w => w.Category == weaponCategory)),

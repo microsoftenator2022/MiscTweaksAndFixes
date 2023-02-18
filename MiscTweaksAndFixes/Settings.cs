@@ -117,8 +117,8 @@ namespace MiscTweaksAndFixes
                         "Bloodrager Draconic Claws fix",
                         longDescription:
                             $"Fixes claw progression for draconic bloodrager bloodlines:{Environment.NewLine}"
-                            + $"Correct progression: 1d6, 1d8, 1d8 (Magic), 1d8+1d6 elemental (Magic){Environment.NewLine}"
-                            + "Actual progression (without fix): 1d6, 1d6, 1d6, 1d8 (Magic), 1d8+1d6 elemental (Magic)")
+                            + $"Correct progression: 1d6, 1d6 (Magic), 1d8 (Magic), 1d8+1d6 elemental (Magic){Environment.NewLine}"
+                            + "Actual progression (without fix): 1d6, 1d6, 1d6, 1d8+1d6 elemental (Magic)")
                     .OnValueChanged(newValue => BloodragerDraconicBaseBuffFixes.Enabled = newValue);
 
                 var dollRoomPpColorAdjustmentsFilter =
@@ -170,10 +170,10 @@ namespace MiscTweaksAndFixes
                     .AddSubHeader(Localization.CreateString($"{Main.Mod.ModEntry.Info.Id}.Debug", "Debug options"))
                     .AddToggle(debugLoggingToggle);
 
-                var debugSetting = new SettingsEntityBool(SettingsKey("debug"), false);
-                var debugSettingUI = UnityEngine.ScriptableObject.CreateInstance<UISettingsEntityBool>();
-                //debugSettingUI.
-                var settingsGroup = UnityEngine.ScriptableObject.CreateInstance<UISettingsGroup>();
+                //var debugSetting = new SettingsEntityBool(SettingsKey("debug"), false);
+                //var debugSettingUI = UnityEngine.ScriptableObject.CreateInstance<UISettingsEntityBool>();
+                ////debugSettingUI.
+                //var settingsGroup = UnityEngine.ScriptableObject.CreateInstance<UISettingsGroup>();
 
                 ModMenu.ModMenu.AddSettings(settings);
             }

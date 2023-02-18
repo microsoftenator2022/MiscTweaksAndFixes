@@ -180,10 +180,15 @@ namespace MiscTweaksAndFixes.Bloodrager
 
         public static IEnumerable<BlueprintFeature> GetBloodragerDragonClawFeaturesFor(UnitEntityData unit)
         {
-            static bool IsBloodragerDraconicBloodline(BlueprintProgression progression) =>
-                progression.LevelEntries
-                    .First(le => le.Level == 1).Features
+            static bool IsBloodragerDraconicBloodline(BlueprintProgression progression)
+            {
+                var levelEntries = progression.LevelEntries.FirstOrDefault(le => le.Level == 1);
+                
+                if (levelEntries is null) return false;
+
+                return levelEntries.Features
                         .Contains(OwlcatBlueprints.BloodragerDraconicBaseFeature.GetBlueprint());
+            }
 
             var progressions = unit.Progression.m_Progressions.Values;
 
@@ -206,52 +211,6 @@ namespace MiscTweaksAndFixes.Bloodrager
 
             return features;
         }
-
-        //private static readonly Lazy<IReadOnlyDictionary<BlueprintFeature, BlueprintItemWeapon>> featureClawMappings = new(() =>
-        //    new Dictionary<BlueprintFeature, BlueprintItemWeapon>()
-        //    {
-        //        { OwlcatBlueprints.BloodragerDraconicClawFeature1.GetBlueprint(),
-        //            OwlcatBlueprints.BloodragerDraconicClaw1d6.GetBlueprint() },
-        //        { OwlcatBlueprints.BloodragerDraconiclClawFeature4.GetBlueprint(),
-        //            OwlcatBlueprints.BloodragerDraconicClaw1d6Magic.GetBlueprint() },
-        //        { OwlcatBlueprints.BloodragerDraconicClawFeature8.GetBlueprint(),
-        //            OwlcatBlueprints.BloodragerDraconicClaw1d8Magic.GetBlueprint() },
-        //        { OwlcatBlueprints.BloodragerDraconicClawFeature12Acid.GetBlueprint(),
-        //            OwlcatBlueprints.BloodragerDraconicClaw1d8MagicAcid.GetBlueprint() },
-        //        { OwlcatBlueprints.BloodragerDraconicClawFeature12Cold.GetBlueprint(),
-        //            OwlcatBlueprints.BloodragerDraconicClaw1d8MagicCold.GetBlueprint() },
-        //        { OwlcatBlueprints.BloodragerDraconicClawFeature12Electricity.GetBlueprint(),
-        //            OwlcatBlueprints.BloodragerDraconicClaw1d8MagicElectricity.GetBlueprint() },
-        //        { OwlcatBlueprints.BloodragerDraconicClawFeature12Fire.GetBlueprint(),
-        //            OwlcatBlueprints.BloodragerDraconicClaw1d8MagicFire.GetBlueprint() },
-        //    });
-        //internal static IReadOnlyDictionary<BlueprintFeature, BlueprintItemWeapon> FeatureClawMappings => featureClawMappings.Value;
-
-        //public static IDictionary<int, BlueprintItemWeapon> GetBloodragerDraconicClawsByLevel(BlueprintProgression dragonBloodline) =>
-        //    dragonBloodline.LevelEntries.SelectMany(le =>
-        //        ClawFeatures
-        //            .Where(cf => le.Features.Contains(cf))
-        //            .Select(f => (le.Level, FeatureClawMappings[f])))
-        //        .ToDictionary();
-
-        //public static IEnumerable<BlueprintItemWeapon> GetBloodragerDragonClawsFor(UnitEntityData unit)
-        //{
-        //    static bool IsBloodragerDraconicBloodline(BlueprintProgression progression) =>
-        //        progression.LevelEntries
-        //            .First(le => le.Level == 1).Features
-        //                .Contains(OwlcatBlueprints.BloodragerDraconicBaseFeature.GetBlueprint());
-
-        //    return unit.Facts.List
-        //        .OfType<ProgressionData>()
-        //        .Where(p => IsBloodragerDraconicBloodline(p.Blueprint))
-        //        .Select(p =>
-        //        {
-        //            var bloodlineClaws = GetBloodragerDraconicClawsByLevel(p.Blueprint);
-        //            return bloodlineClaws[bloodlineClaws.Keys
-        //                .OrderByDescending(Functional.Id)
-        //                .First(level => level <= p.Level)];
-        //        });
-        //}
     }
 
     public static class BloodragerDraconicBaseBuffFixes
