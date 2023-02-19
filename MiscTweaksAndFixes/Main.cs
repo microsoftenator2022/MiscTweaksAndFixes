@@ -89,6 +89,16 @@ namespace MiscTweaksAndFixes
         {
             Log.Debug($"{nameof(Main)}.{nameof(Load)}");
 
+            if (UnityModManager.FindMod("AlternateHumanTraits") is UnityModManager.ModEntry other)
+            {
+                var otherVersion = other.Version;
+                if (otherVersion < Version.Parse("1.0.1"))
+                {
+                    modEntry.Logger.Critical($"Incompatible mod version of 'AlternateHumanTraits': {otherVersion} version >= 1.0.1 required.");
+                    return false;
+                }
+            }
+
             var harmony = new Harmony(modEntry.Info.Id);
 
             Mod.OnLoad(modEntry, harmony);
