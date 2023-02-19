@@ -31,6 +31,13 @@ Primalist bloodline selections are now per-bloodline and should function correct
 Dragon Disciple and/or Second Bloodline (still two rage powers per 4 levels, but you can choose which
 bloodline's power to trade).
 
+### Bloodrager Draconic Claws fix
+Fixes claw progression for draconic bloodrager bloodlines: 
+
+Correct progression: 1d6, 1d8, 1d8 (Magic), 1d8+1d6 elemental (Magic)
+
+Actual progression (without fix): 1d6, 1d6, 1d6, 1d8 (Magic), 1d8+1d6 elemental (Magic)
+
 ### Force Book of Dreams Upgrade
 
 The Book of Dreams item is supposed to upgrade at certain points in the story,
@@ -41,6 +48,10 @@ upgrade script to run on every Etude update. Disabled by default.
 
 Changes the damage reduction for the Reformed Fiend Bloodrage archetype from DR/evil to DR/good.
 Disabled by default.
+
+### Dollroom postprocessing filter toggles
+
+Allows you to disable some postprocess filters in the dollroom (inventory screen, character creation. mythic level up, etc.)
 
 ## Acknowledgements
 
