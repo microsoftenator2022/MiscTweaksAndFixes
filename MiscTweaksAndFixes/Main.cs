@@ -87,8 +87,6 @@ namespace MiscTweaksAndFixes
 
         static bool Load(UnityModManager.ModEntry modEntry)
         {
-            Log.Debug($"{nameof(Main)}.{nameof(Load)}");
-
             if (UnityModManager.FindMod("AlternateHumanTraits") is UnityModManager.ModEntry other)
             {
                 var otherVersion = other.Version;
@@ -98,6 +96,8 @@ namespace MiscTweaksAndFixes
                     return false;
                 }
             }
+
+            Log.Debug($"{nameof(Main)}.{nameof(Load)}");
 
             var harmony = new Harmony(modEntry.Info.Id);
 
@@ -145,9 +145,9 @@ namespace MiscTweaksAndFixes
             ReformedFiendDamageReductionGood.PatchDamageReduction();
             BookOfDreams.BookOfDreamsFix.BookOfDreamsUpgradeFix();
             StrengthBlessingMajor.StrengthBlessingMajorBuff.ArmorSpeedFix();
-            PrimalistBloodlineFixes.PatchPrimalistProgression();
+            //PrimalistBloodlineFixes.PatchPrimalistProgression();
 
-            BloodragerDraconicBaseBuffFixes.FixBloodragerDraconicClawsBuff();
+            //BloodragerDraconicBaseBuffFixes.FixBloodragerDraconicClawsBuff();
 
             Localization.Default.LoadAll();
         }

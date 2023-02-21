@@ -213,63 +213,63 @@ namespace MiscTweaksAndFixes.Bloodrager
         }
     }
 
-    public static class BloodragerDraconicBaseBuffFixes
-    {
-        internal static bool Enabled = true;
+    //public static class BloodragerDraconicBaseBuffFixes
+    //{
+    //    internal static bool Enabled = true;
 
-        internal static void FixBloodragerDraconicClawsBuff()
-        {
-            if (!Enabled) return;
+    //    internal static void FixBloodragerDraconicClawsBuff()
+    //    {
+    //        if (!Enabled) return;
 
-            Main.Log.Debug($"{nameof(BloodragerDraconicBaseBuffFixes)}.{nameof(FixBloodragerDraconicClawsBuff)}");
+    //        Main.Log.Debug($"{nameof(BloodragerDraconicBaseBuffFixes)}.{nameof(FixBloodragerDraconicClawsBuff)}");
 
-            var clawsBuff4 = OwlcatBlueprints.BloodragerDraconicClawBuff4.GetBlueprint();
+    //        var clawsBuff4 = OwlcatBlueprints.BloodragerDraconicClawBuff4.GetBlueprint();
 
-            // Buff weapon for level 4 is 1d8Magic, should be 1d6Magic
-            if (clawsBuff4.Components[0] is EmptyHandWeaponOverride weaponComponent)
-            {
-                Main.Log.Debug($"Fixing {clawsBuff4.AssetGuid}");
+    //        // Buff weapon for level 4 is 1d8Magic, should be 1d6Magic
+    //        if (clawsBuff4.Components[0] is EmptyHandWeaponOverride weaponComponent)
+    //        {
+    //            Main.Log.Debug($"Fixing {clawsBuff4.AssetGuid}");
 
-                weaponComponent.m_Weapon =
-                    OwlcatBlueprints.BloodragerDraconicClaw1d6Magic.GetBlueprint()
-                        .ToReference<BlueprintItemWeaponReference>();
-            }
+    //            weaponComponent.m_Weapon =
+    //                OwlcatBlueprints.BloodragerDraconicClaw1d6Magic.GetBlueprint()
+    //                    .ToReference<BlueprintItemWeaponReference>();
+    //        }
 
-            var bdbb = OwlcatBlueprints.BloodragerDraconicBaseBuff.GetBlueprint();
+    //        var bdbb = OwlcatBlueprints.BloodragerDraconicBaseBuff.GetBlueprint();
 
-            if (bdbb.ComponentsArray[0] is not AddFactContextActions afca) return;
+    //        if (bdbb.ComponentsArray[0] is not AddFactContextActions afca) return;
 
-            if (afca.Activated.Actions.OfType<Conditional>().FirstOrDefault(c => c.Comment == "Claws")
-                is not Conditional clawsConditional) return;
+    //        if (afca.Activated.Actions.OfType<Conditional>().FirstOrDefault(c => c.Comment == "Claws")
+    //            is not Conditional clawsConditional) return;
 
-            var clawsBuff8 = OwlcatBlueprints.BloodragerDraconicClawBuff8.GetBlueprint();
+    //        var clawsBuff8 = OwlcatBlueprints.BloodragerDraconicClawBuff8.GetBlueprint();
 
-            // Conditions for level 4 and 8 incorrectly check for the buff they should be adding instead of the features from the progression
-            foreach (var condition in clawsConditional.Flatten())
-            {
-                if(condition.ConditionsChecker.Conditions.OfType<ContextConditionHasFact>().FirstOrDefault() 
-                    is not ContextConditionHasFact cchf) continue;
+    //        // Conditions for level 4 and 8 incorrectly check for the buff they should be adding instead of the features from the progression
+    //        foreach (var condition in clawsConditional.Flatten())
+    //        {
+    //            if(condition.ConditionsChecker.Conditions.OfType<ContextConditionHasFact>().FirstOrDefault() 
+    //                is not ContextConditionHasFact cchf) continue;
 
-                if (cchf.Fact == clawsBuff8)
-                {
-                    var clawFeature8 = OwlcatBlueprints.BloodragerDraconicClawFeature8.GetBlueprint();
+    //            if (cchf.Fact == clawsBuff8)
+    //            {
+    //                var clawFeature8 = OwlcatBlueprints.BloodragerDraconicClawFeature8.GetBlueprint();
 
-                    Main.Log.Debug($"Replacing condition {cchf.Fact.AssetGuid} with {clawFeature8.AssetGuid}");
+    //                Main.Log.Debug($"Replacing condition {cchf.Fact.AssetGuid} with {clawFeature8.AssetGuid}");
 
-                    cchf.m_Fact = clawFeature8.ToReference<BlueprintUnitFactReference>();
+    //                cchf.m_Fact = clawFeature8.ToReference<BlueprintUnitFactReference>();
 
-                    continue;
-                }
+    //                continue;
+    //            }
 
-                if (cchf.Fact == clawsBuff4)
-                {
-                    var clawFeature4 = OwlcatBlueprints.BloodragerDraconiclClawFeature4.GetBlueprint();
+    //            if (cchf.Fact == clawsBuff4)
+    //            {
+    //                var clawFeature4 = OwlcatBlueprints.BloodragerDraconiclClawFeature4.GetBlueprint();
 
-                    Main.Log.Debug($"Replacing condition {cchf.Fact.AssetGuid} with {clawFeature4.AssetGuid}");
+    //                Main.Log.Debug($"Replacing condition {cchf.Fact.AssetGuid} with {clawFeature4.AssetGuid}");
 
-                    cchf.m_Fact = clawFeature4.ToReference<BlueprintUnitFactReference>();
-                }
-            }
-        }
-    }
+    //                cchf.m_Fact = clawFeature4.ToReference<BlueprintUnitFactReference>();
+    //            }
+    //        }
+    //    }
+    //}
 }

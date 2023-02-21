@@ -51,16 +51,16 @@ namespace MiscTweaksAndFixes
 
             internal static void SettingsInit()
             {
-                var primalistToggle =
-                    CreateSettingToggle(
-                        $"{nameof(PrimalistBloodlineFixes)}",
-                        "Primalist bloodline selection fix",
-                        longDescription:
-                            "Primalist bloodline selections are now per-bloodline and should function correctly when "
-                            + "combined with Dragon Disciple and/or Second Bloodline (still two rage powers per 4 "
-                            + "levels, but you can choose which bloodline's power to trade)\n"
-                            + "Requires restart.")
-                    .OnValueChanged(newValue => PrimalistBloodlineFixes.Enabled = newValue);
+                //var primalistToggle =
+                //    CreateSettingToggle(
+                //        $"{nameof(PrimalistBloodlineFixes)}",
+                //        "Primalist bloodline selection fix",
+                //        longDescription:
+                //            "Primalist bloodline selections are now per-bloodline and should function correctly when "
+                //            + "combined with Dragon Disciple and/or Second Bloodline (still two rage powers per 4 "
+                //            + "levels, but you can choose which bloodline's power to trade)\n"
+                //            + "Requires restart.")
+                //    .OnValueChanged(newValue => PrimalistBloodlineFixes.Enabled = newValue);
 
                 var bookOfDreamsToggle =
                     CreateSettingToggle(
@@ -111,15 +111,15 @@ namespace MiscTweaksAndFixes
                             + "Requires restart.")
                     .OnValueChanged(newValue => StrengthBlessingMajor.StrengthBlessingMajorBuff.Enabled = newValue);
 
-                var bloodragerDraconicClawsFix =
-                    CreateSettingToggle(
-                        name: $"{nameof(BloodragerDraconicBaseBuffFixes.FixBloodragerDraconicClawsBuff)}",
-                        "Bloodrager Draconic Claws fix",
-                        longDescription:
-                            $"Fixes claw progression for draconic bloodrager bloodlines:{Environment.NewLine}"
-                            + $"Correct progression: 1d6, 1d6 (Magic), 1d8 (Magic), 1d8+1d6 elemental (Magic){Environment.NewLine}"
-                            + "Actual progression (without fix): 1d6, 1d6, 1d6, 1d8+1d6 elemental (Magic)")
-                    .OnValueChanged(newValue => BloodragerDraconicBaseBuffFixes.Enabled = newValue);
+                //var bloodragerDraconicClawsFix =
+                //    CreateSettingToggle(
+                //        name: $"{nameof(BloodragerDraconicBaseBuffFixes.FixBloodragerDraconicClawsBuff)}",
+                //        "Bloodrager Draconic Claws fix",
+                //        longDescription:
+                //            $"Fixes claw progression for draconic bloodrager bloodlines:{Environment.NewLine}"
+                //            + $"Correct progression: 1d6, 1d6 (Magic), 1d8 (Magic), 1d8+1d6 elemental (Magic){Environment.NewLine}"
+                //            + "Actual progression (without fix): 1d6, 1d6, 1d6, 1d8+1d6 elemental (Magic)")
+                //    .OnValueChanged(newValue => BloodragerDraconicBaseBuffFixes.Enabled = newValue);
 
                 var dollRoomPpColorAdjustmentsFilter =
                     CreateSettingToggle(
@@ -150,9 +150,9 @@ namespace MiscTweaksAndFixes
                     .AddSubHeader(
                         Localization.CreateString($"{nameof(Main.Mod.ModEntry.Info.Id)}.Fixes", "Fixes"),
                         true)
-                    .AddToggle(primalistToggle)
+                    //.AddToggle(primalistToggle)
                     .AddToggle(bookOfDreamsToggle)
-                    .AddToggle(bloodragerDraconicClawsFix)
+                    //.AddToggle(bloodragerDraconicClawsFix)
                     .AddToggle(strengthBlessingMajorFixToggle)
 
                     .AddSubHeader(

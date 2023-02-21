@@ -1,13 +1,13 @@
 ﻿{
   "Id": "MiscTweaksAndFixes",
   "DisplayName": "Miscellaneous Tweaks and Fixes",
-  "Version": "0.9.7.1",
+  "Version": "0.9.8-beta",
   "Author": "microsoftenator",
   "HomePage": "https://github.com/microsoftenator2022/MiscTweaksAndFixes/releases",
   "Repository": "https://raw.githubusercontent.com/microsoftenator2022/MiscTweaksAndFixes/master/Repository.json",
 
   "ManagerVersion": "0.23.0",
-  "GameVersion": "1.4.0",
+  "GameVersion": "1.1.0j",
 
   "Requirements": [ "ModMenu-1.1.0" ],
 
